@@ -31,7 +31,7 @@ export default class RandomSuggester extends Suggester {
         do {
             row = this._getRandomInt(1, size);
             column = this._getRandomInt(1, size);
-        } while (game.board[row][column].type == 'coral');
+        } while (game.board[row][column].type === 'coral');
 
         return new CellSuggestion(row, column);
     }
