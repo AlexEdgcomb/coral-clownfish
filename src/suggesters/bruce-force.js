@@ -237,10 +237,9 @@ export default class BruteForceSuggester extends Suggester {
             };
         }
         else {
-            // End early if |current| exceeds fulfillment or has touching fish
-
-            // End early if fulfillment not met.
             if (current.length > 2) {
+
+                // End early if |current| exceeds fulfillment.
                 this.setFulfillment(current);
                 for (let i = 1; i < current[0]; i++) {
                     if (!current[0][i].fulfillmentExceeded) {
@@ -254,10 +253,12 @@ export default class BruteForceSuggester extends Suggester {
                 }
             }
 
-            current.push(null);
             for (let i = 0; i < validRowsPerColumn[depth].length; i++) {
-                current[current.length - 1] = validRowsPerColumn[depth][i];
+                current.push(validRowsPerColumn[depth][i]);
+
                 const winner = this.findWinningBoard(validRowsPerColumn, depth + 1, current);
+
+                current.pop();
 
                 if (winner) {
                     return winner;
