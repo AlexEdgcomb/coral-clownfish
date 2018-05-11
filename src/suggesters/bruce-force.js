@@ -241,8 +241,8 @@ export default class BruteForceSuggester extends Suggester {
 
                 // End early if |current| exceeds fulfillment.
                 this.setFulfillment(current);
-                for (let i = 1; i < current[0]; i++) {
-                    if (!current[0][i].fulfillmentExceeded) {
+                for (let i = 1; i < current[0].length; i++) {
+                    if (current[0][i].fulfillmentExceeded) {
                         return;
                     }
                 }
