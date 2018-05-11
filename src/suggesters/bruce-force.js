@@ -267,7 +267,6 @@ export default class BruteForceSuggester extends Suggester {
 
                 // End early if corals in all but last row don't have a fish.
                 if (!this._coralHaveFishInAllButLastRow(current)) {
-                    debugger
                     return;
                 }
             }
