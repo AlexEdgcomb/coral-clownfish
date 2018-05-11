@@ -83,6 +83,45 @@ export default class BruteForceSuggester extends Suggester {
         return rows.every(cell => cell.fulfilled) && cols.every(cell => cell.fulfilled);
     }
 
+    // Make sure an indidivual coral defined at rowIndex, columnIndex has a fish around it.
+    hasFish(board, rowIndex, columnIndex) {
+
+        const cells = [];
+
+        // Top
+        if (columnIndex >= 1) {
+            cells.push(board[ rowIndex ][ columnIndex - 1 ])
+        }
+        // Left
+        if (rowIndex >= 1) {
+            cells.push(board[ rowIndex - 1 ][ columnIndex ]);
+        }
+        // Bottom
+        if (rowIndex <= board.length - 2) {
+            cells.push(board[ rowIndex + 1 ][ columnIndex ]);
+        }
+        // Right
+        if (columnIndex <= board[0].length - 2) {
+            cells.push(board[ rowIndex ][ columnIndex + 1 ]);
+        }
+
+        return cells.some(cell => cell.type === 'clownfish');
+    }
+
+    _coralHaveFishInAllButLastRow(board) {
+      let coralHaveFish = true;
+
+      for (let rowIndex = 1; rowIndex < (board.length - 1); rowIndex++) {
+          board[rowIndex].forEach((cell, columnIndex) => {
+              if (cell.type === 'coral' && !this.hasFish(board, rowIndex, columnIndex)) {
+                  coralHaveFish = false;
+              }
+          });
+      }
+
+      return coralHaveFish;
+    }
+
     /**
        Utility function if all coral have a clownfish to keep them healthy.
        @method _coralHaveFish
@@ -90,36 +129,10 @@ export default class BruteForceSuggester extends Suggester {
        @return {Boolean}
     */
     _coralHaveFish(board) {
-
-        // Make sure an indidivual coral defined at rowIndex, columnIndex has a fish around it.
-        const hasFish = function(rowIndex, columnIndex) {
-
-            const cells = [];
-
-            // Top
-            if (columnIndex >= 1) {
-                cells.push(board[ rowIndex ][ columnIndex - 1 ])
-            }
-            // Left
-            if (rowIndex >= 1) {
-                cells.push(board[ rowIndex - 1 ][ columnIndex ]);
-            }
-            // Right
-            if (rowIndex <= board.length -2) {
-                cells.push(board[ rowIndex + 1 ][ columnIndex ]);
-            }
-            // Bottom
-            if (columnIndex <= board.length - 2) {
-                cells.push(board[ rowIndex     ][ columnIndex + 1 ]);
-            }
-
-            return cells.some(cell => cell.type === 'clownfish');
-        }
-
         let coralHaveFish = true;
         board.forEach((row, rowIndex) => {
             row.forEach((cell, columnIndex) => {
-                if (cell.type === 'coral' && !hasFish(rowIndex, columnIndex)) {
+                if (cell.type === 'coral' && !this.hasFish(board, rowIndex, columnIndex)) {
                     coralHaveFish = false;
                 }
             });
@@ -249,6 +262,11 @@ export default class BruteForceSuggester extends Suggester {
 
                 // End early if fish not spaced well.
                 if (!this._fishHaveSpace(current)) {
+                    return;
+                }
+
+                if (!this._coralHaveFishInAllButLastRow(current)) {
+                    debugger
                     return;
                 }
             }
