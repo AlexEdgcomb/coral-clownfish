@@ -295,6 +295,30 @@ export default class BruteForceSuggester extends Suggester {
         });
     }
 
+    isSameBoard(board1, board2) {
+        let isSameBoard = false;
+
+        if (board1 && board2) {
+            const isSameRows = board1.length === board2.length;
+
+            if (isSameRows) {
+                const isSameColumns = board1[0].length === board2[0].length;
+
+                if (isSameColumns) {
+                    isSameBoard = true;
+                    for (let row = 1; row < board1.length; row++) {
+                        for (let col = 1; col < board1[0].length; col++) {
+                            if (board1[row][col].type !== board2[row][col].type) {
+                                isSameBoard = false;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return isSameBoard;
+    }
+
     /**
        Overridden method of base class. Will return a random cell to click.
        @method nextSuggestion
@@ -306,12 +330,18 @@ export default class BruteForceSuggester extends Suggester {
 
         this.clearBoard(clonedBoard);
 
-        const validRowsPerColumn = this.findValidRowsPerColumn(clonedBoard);
-        const winningBoard = this.findWinningBoard(validRowsPerColumn, 0, [ clonedBoard[0] ]);
+        if (!this.isSameBoard(clonedBoard, this.previousBoard)) {
 
-        for (let rowIndex = 1; rowIndex < clonedBoard.length; rowIndex++) {
-            for (let columnIndex = 1; columnIndex < clonedBoard[0].length; columnIndex++) {
-                if (game.board[rowIndex][columnIndex].type !== winningBoard[rowIndex][columnIndex].type) {
+            const validRowsPerColumn = this.findValidRowsPerColumn(clonedBoard);
+
+            this.previousBoard = clonedBoard;
+            this.winningBoard = this.findWinningBoard(validRowsPerColumn, 0, [ clonedBoard[0] ]);
+        }
+
+
+        for (let rowIndex = 1; rowIndex < game.board.length; rowIndex++) {
+            for (let columnIndex = 1; columnIndex < game.board[0].length; columnIndex++) {
+                if (game.board[rowIndex][columnIndex].type !== this.winningBoard[rowIndex][columnIndex].type) {
                     return new CellSuggestion(rowIndex, columnIndex)
                 }
             }
