@@ -319,6 +319,15 @@ export default class BruteForceSuggester extends Suggester {
         return isSameBoard;
     }
 
+    findPreviousWinningBoard(board) {
+        for (let i = 0; i < this.previousBoards.length; i++) {
+            if (this.isSameBoard(board, this.previousBoards[i])) {
+                return this.winningBoards[i];
+            }
+        }
+        return null;
+    }
+
     /**
        Overridden method of base class. Will return a random cell to click.
        @method nextSuggestion
@@ -326,22 +335,27 @@ export default class BruteForceSuggester extends Suggester {
        @return {Cell}
     */
     nextSuggestion(game) {
+        if (!this.previousBoards) {
+            this.previousBoards = [];
+            this.winningBoards = [];
+        }
+
         const clonedBoard = this.clone(game.board);
 
         this.clearBoard(clonedBoard);
+        let winningBoard = this.findPreviousWinningBoard(clonedBoard);
 
-        if (!this.isSameBoard(clonedBoard, this.previousBoard)) {
-
+        if (!winningBoard) {
             const validRowsPerColumn = this.findValidRowsPerColumn(clonedBoard);
 
-            this.previousBoard = clonedBoard;
-            this.winningBoard = this.findWinningBoard(validRowsPerColumn, 0, [ clonedBoard[0] ]);
+            winningBoard = this.findWinningBoard(validRowsPerColumn, 0, [ clonedBoard[0] ]);
+            this.previousBoards.push(clonedBoard);
+            this.winningBoards.push(winningBoard);
         }
-
 
         for (let rowIndex = 1; rowIndex < game.board.length; rowIndex++) {
             for (let columnIndex = 1; columnIndex < game.board[0].length; columnIndex++) {
-                if (game.board[rowIndex][columnIndex].type !== this.winningBoard[rowIndex][columnIndex].type) {
+                if (game.board[rowIndex][columnIndex].type !== winningBoard[rowIndex][columnIndex].type) {
                     return new CellSuggestion(rowIndex, columnIndex)
                 }
             }
