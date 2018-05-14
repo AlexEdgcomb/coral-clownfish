@@ -295,30 +295,6 @@ export default class BruteForceSuggester extends Suggester {
         });
     }
 
-    isSameBoard(board1, board2) {
-        let isSameBoard = false;
-
-        if (board1 && board2) {
-            const isSameRows = board1.length === board2.length;
-
-            if (isSameRows) {
-                const isSameColumns = board1[0].length === board2[0].length;
-
-                if (isSameColumns) {
-                    isSameBoard = true;
-                    for (let row = 1; row < board1.length; row++) {
-                        for (let col = 1; col < board1[0].length; col++) {
-                            if (board1[row][col].type !== board2[row][col].type) {
-                                isSameBoard = false;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        return isSameBoard;
-    }
-
     /**
        Overridden method of base class. Will return a random cell to click.
        @method nextSuggestion
